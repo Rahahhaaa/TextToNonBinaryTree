@@ -71,7 +71,7 @@ input = '''
 ```
 
 ---
-### Output Visualization
+### Tree Visualization
 
 REF : https://copyprogramming.com/howto/how-to-print-a-tree-in-python
 
