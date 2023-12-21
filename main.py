@@ -6,24 +6,16 @@ class Node:
         self.item = item
         self.type = type_
         self.children = []
-        
-    def preorder(self):
-        print(self.item)
-        for i in self.children:
-            i.preorder()
-        
+
 class NBT:
     def __init__(self, r):
         self.root = r
-        
-    def preorder(self):
-        if self.root: self.root.preorder()
 
 def tokenizer(input_expression):
     current = 0
     tokens = []
-    topic = re.compile('topic\s*:\s*"(?P<item>[^\"]*)"', re.I);
-    sentence = re.compile('sentence\s*:\s*"(?P<item>[^\"]*)"', re.I);
+    node = re.compile('node\s*:\s*"(?P<item>[^\"]*)"', re.I);
+    leaf = re.compile('leaf\s*:\s*"(?P<item>[^\"]*)"', re.I);
     whiteSpace = re.compile(r"\s");
     while current < len(input_expression):
         char = input_expression[current]
@@ -44,19 +36,19 @@ def tokenizer(input_expression):
             })
             current = current + 1
             continue
-        if topic.match(input_expression[current:]):
+        if node.match(input_expression[current:]):
             tokens.append({
-                'type':'topic',
-                'value':topic.match(input_expression[current:]).group('item')
+                'type':'node',
+                'value':node.match(input_expression[current:]).group('item')
             })
-            current = current+topic.match(input_expression[current:]).end()
+            current = current+node.match(input_expression[current:]).end()
             continue
-        if sentence.match(input_expression[current:]):
+        if leaf.match(input_expression[current:]):
             tokens.append({
-                'type':'sentence',
-                'value': sentence.match(input_expression[current:]).group('item')
+                'type':'leaf',
+                'value': leaf.match(input_expression[current:]).group('item')
             })
-            current = current+sentence.match(input_expression[current:]).end()
+            current = current+leaf.match(input_expression[current:]).end()
             continue
         current = current + 1
     return tokens
@@ -71,12 +63,12 @@ def parser(tokens):
         stack = collections.deque()
         while True:
             token = tokens[current]
-            if token.get('type') == 'topic':
+            if token.get('type') == 'node':
                 parg = Node(token.get('value'), token.get('type'))
                 aarg.children.append(parg)
                 current = current + 1
                 walk(parg)
-            elif token.get('type') == 'sentence':
+            elif token.get('type') == 'leaf':
                 aarg.children.append(Node(token.get('value'),token.get('type')))
                 current = current + 1
             elif token.get('type') == 'left_paren':
@@ -92,7 +84,7 @@ def parser(tokens):
                 
     while current < len(tokens):
         parg = Node(tokens[current].get('value'),tokens[current].get('type'))
-        if tokens[current].get('type') == 'topic':
+        if tokens[current].get('type') == 'node':
             parents.append(parg)
             current = current + 1
             walk(parg)
@@ -130,43 +122,43 @@ def print_tree(current_node, indent="", last='updown'):
 
 def main():
     input = '''
-              topic:"food"{
-	sentence:"I love food",
-	sentence:"my favorite food is mola😁",
-	topic:"korean food"{
-		sentence:"kimchi",
-		topic:"tang"{
-			sentence:"budaejjigae",
-			sentence:"kimchijjigae",
-			topic:"seafoodtang"{
-				sentence:"haemuljjambbongtang",
+              node:"food"{
+	leaf:"I love food",
+	leaf:"my favorite food is mola😁",
+	node:"korean food"{
+		leaf:"kimchi",
+		node:"tang"{
+			leaf:"budaejjigae",
+			leaf:"kimchijjigae",
+			node:"seafoodtang"{
+				leaf:"haemuljjambbongtang",
 			},
-			topic:"sogogitang"{
-				sentence:"galbijjim",
+			node:"sogogitang"{
+				leaf:"galbijjim",
 			}
 		},
 	},
-	topic:"chinese food"{
-		sentence:"tanghulu",
-		sentence:"tangsuyuk",
-		sentence:"jjambbong",
+	node:"chinese food"{
+		leaf:"tanghulu",
+		leaf:"tangsuyuk",
+		leaf:"jjambbong",
 	}
 }
 
-topic:"programming"{
-    sentence:"not coding",
-    topic:"c++"{
-        sentence:"adlfkjlsfkgj"
+node:"programming"{
+    leaf:"not coding",
+    node:"c++"{
+        leaf:"adlfkjlsfkgj"
     }
-    topic:"java"{
-        sentence:"akfjgslfjg"
+    node:"java"{
+        leaf:"akfjgslfjg"
     }
-    topic:"python"{
-        sentence:"aldkfjs;lkfgj;sklf",
-        sentence:"askfdjg;slkfj;"
+    node:"python"{
+        leaf:"aldkfjs;lkfgj;sklf",
+        leaf:"askfdjg;slkfj;"
     }
 }
-              '''
+'''
     tokens = tokenizer(input)
     maps = []
     roots = parser(tokens)
