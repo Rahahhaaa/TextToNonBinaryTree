@@ -25,8 +25,8 @@ class NBT:
 
 ### Input
 #### Input Rule
-1. Only use keyword node and leaf 
-2. Use colon to assign value 
+1. Only use keyword "node" and "leaf"
+2. Use "colon :" to assign value 
 3. Child node must be parenthesized
 4. Leaf can't have child node
 ```python
