@@ -120,7 +120,7 @@ def print_tree(current_node, indent="", last='updown'):
         next_indent = '{0}{1}{2}'.format(indent, ' ' if 'down' in last else '│', " " * len(current_node.item))
         print_tree(child, indent=next_indent, last=next_last)
 
-def main():
+if __name__ == "__main__":
     input = '''
               node:"food"{
 	leaf:"I love food",
@@ -167,7 +167,3 @@ node:"programming"{
     
     for map_ in maps:
         print_tree(map_.root)
-
-if __name__ == "__main__":
-    main()
-
